@@ -3,7 +3,7 @@ import Transactions from "../network/transactions";
 
 const Add = {
     async init() {
-        CheckUserAuth.checkLoginState();
+        // CheckUserAuth.checkLoginState();
         
         this._initialListener();
         this._initialUI();
@@ -53,7 +53,11 @@ const Add = {
             console.log(formData);
 
             try {
-                const response = await Transactions.store(formData);
+                const storageResponse = await Transactions.storeEvidence(formData.evidence);
+                const response = await Transactions.store({
+                    ...formData,
+                    evidence: storageResponse.metadata.fullPath
+                });
 
                 alert('New data added successfully');
 

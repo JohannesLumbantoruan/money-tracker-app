@@ -1,8 +1,7 @@
 import { html } from "lit";
 import LitWithoutShadowDom from "./base/LitWithoutShadowDom";
-import Utils from '../utils/utils';
-import Config from '../config/config';
 import CheckUserAuth from '../pages/auth/check-auth-user';
+import Auth from "../network/auth";
 
 class NavLinkAuth extends LitWithoutShadowDom {
     render() {
@@ -34,11 +33,19 @@ class NavLinkAuth extends LitWithoutShadowDom {
         `;
     }
 
-    _userLogOut(event) {
+    async _userLogOut(event) {
         event.preventDefault();
-        Utils.destroyUserToken(Config.USER_TOKEN_KEY);
+        // Utils.destroyUserToken(Config.USER_TOKEN_KEY);
 
-        CheckUserAuth.checkLoginState();
+        // CheckUserAuth.checkLoginState();
+
+        try {
+            const respose = await Auth.login();
+
+            CheckUserAuth.checkLoginState();
+        } catch (error) {
+            console.error(error);
+        }
     }}
 
 customElements.define('nav-link-auth', NavLinkAuth);

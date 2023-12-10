@@ -3,7 +3,7 @@ import Transactions from "../network/transactions";
 
 const Edit = {
     async init() {
-        CheckUserAuth.checkLoginState();
+        // CheckUserAuth.checkLoginState();
         
         this._initialUI();
         await this._initialData();
@@ -48,13 +48,11 @@ const Edit = {
         // this._populateTransactionToForm(dataRecord);
 
         try {
-          console.log(transactionId);
           const response = await Transactions.getById(transactionId);
-          const responseRecord = response.data.results;
+          // const responseRecord = response.data.results;
+          this._userTransaction = response;
 
-          sessionStorage.record = JSON.stringify(responseRecord);
-
-          this._populateTransactionToForm(responseRecord);
+          this._populateTransactionToForm(response);
         } catch (error) {
           console.error(error);
         }
@@ -86,6 +84,12 @@ const Edit = {
             console.log(formData);
 
             try {
+              if (formData.evidence) {
+                Transactions.destroyEvidence(this._userTransaction.evidence);
+
+                const storageResponse = await Transactions.storeEvidence(formData.evidence);
+                formData.evidence = storageResponse.metadata.fullPath;
+              }
               const response = await Transactions.update({
                 id: this._getTransactionId(),
                 ...formData
@@ -151,11 +155,21 @@ const Edit = {
     
         nameInput.value = transactionRecord.name;
         amountInput.value = transactionRecord.amount;
-        dateInput.value = transactionRecord.date.slice(0, 16);
+        dateInput.value = transactionRecord.date.toDate().toISOString().slice(0, 16);
         // evidenceInput.setAttribute('src', transactionRecord.evidenceUrl);
         // evidenceInput.setAttribute('alt', transactionRecord.name);
-        inputImagePreviewEdit.setAttribute('defaultImage', transactionRecord.evidenceUrl);
-        inputImagePreviewEdit.setAttribute('defaultImageAlt', transactionRecord.name);
+        // inputImagePreviewEdit.setAttribute('defaultImage', transactionRecord.evidenceUrl);
+        // inputImagePreviewEdit.setAttribute('defaultImageAlt', transactionRecord.name);
+
+        Transactions.getEvidenceURL(transactionRecord.evidence)
+          .then((url) => {
+            inputImagePreviewEdit.setAttribute('defaultImage', url);
+            inputImagePreviewEdit.setAttribute('defaultImageAlt', transactionRecord.name);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
         descriptionInput.value = transactionRecord.description;
         // types.forEach((item) => {
         //     item.checked = item.value === transactionRecord.type;

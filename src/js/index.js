@@ -1,14 +1,17 @@
+import './utils/firebase';
 import 'regenerator-runtime';
 
 import '../scss/vendors-extensions/main.scss';
 
 import * as bootstrap from 'bootstrap';
+// import * as firebase from 'firebase/app';
 import './components';
 import Dashboard from './pages/dashboard';
 import Add from './pages/add';
 import Edit from './pages/edit';
 import Login from './pages/auth/login';
 import Register from './pages/auth/register';
+import CheckUserAuth from './pages/auth/check-auth-user';
 
 const routes = {
     '/': Dashboard,
@@ -33,6 +36,8 @@ const initPages = () => {
 window.addEventListener('DOMContentLoaded', async () => {
     initPages();
 
-    const route = detectRoute();
-    route.init();
+    CheckUserAuth.checkLoginState(async () => {
+        const route = detectRoute();
+        await route.init();
+    });
 });

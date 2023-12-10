@@ -3,7 +3,7 @@ import CheckUserAuth from "./check-auth-user";
 
 const Register = {
     async init() {
-        CheckUserAuth.checkLoginState();
+        // CheckUserAuth.checkLoginState();
         
         this._initialListener();
     },
@@ -27,23 +27,21 @@ const Register = {
     async _getRegistered() {
         const formData = this._getFormData();
 
-        // if (this._validateFormData({ ...formData })) {
-        //     console.log('formData');
-        //     console.log(formData);
-        // }
-
         if (this._validateFormData(formData)) {
             console.log('formData');
             console.log(formData);
 
             try {
                 const response = await Auth.register({
-                    name: formData.name,
                     email: formData.email,
                     password: formData.password
                 });
 
-                console.log(response.data);
+                await Auth.updateProfile(response.user, {
+                    displayName: formData.name
+                });
+
+                sessionStorage.register = JSON.stringify(response);
 
                 this._goToLogInPage();
             } catch (error) {

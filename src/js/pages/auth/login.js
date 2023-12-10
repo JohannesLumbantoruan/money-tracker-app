@@ -5,7 +5,7 @@ import Config from "../../config/config";
 
 const Login = {
     async init() {
-        CheckUserAuth.checkLoginState();
+        // CheckUserAuth.checkLoginState();
 
         this._initialListener();
     },
@@ -40,11 +40,13 @@ const Login = {
                     password: formData.password
                 });
 
+                console.log(response);
+
+                sessionStorage.login = JSON.stringify(response);
+
                 Utils.setUserToken(Config.USER_TOKEN_KEY, response.data.results.token);
 
-                sessionStorage.response = JSON.stringify(response.data);
-
-                this._goToDashboardPage();
+                // this._goToDashboardPage();
             } catch (error) {
                 const { status } = error.response;
 
